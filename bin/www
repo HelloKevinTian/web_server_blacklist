@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+var debug = require('debug')('web_server');
+var app = require('../app');
+var redis_config = require('../config/redis.json');
+var redis_pools = require('../nosql/redis_pools');
+var shedule_wrapper = require('../module/schedule_wrapper');
+var pvp_blacklist_wrapper = require('../module/pvp_blacklist_wrapper');
+
+app.set('port', process.env.PORT || 20005);
+
+var server = app.listen(app.get('port'), function() {
+    debug('Express server listening on port ' + server.address().port);
+    redis_pools.configure(redis_config);
+    shedule_wrapper.init();
+    pvp_blacklist_wrapper.init();
+});

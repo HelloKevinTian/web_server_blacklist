@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link href="/miniui/themes/default/miniui.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    </style>
+    <link href="stylesheets/bootstrap-responsive.css" rel="stylesheet">
+</head>
+<body>
+<h4>添选择日期</h4>
+<input id="date1" class="mini-datepicker" value="<%= date %>" ondrawdate="onDrawDate" onvaluechanged="onDateChanged" />
+<textarea id="textarea_limit" class="mini-textarea" class="auto_textarea"  style="width:1605px;height:200px;"  value=""  emptyText=""></textarea>
+<textarea id="textarea_list" class="mini-textarea" class="auto_textarea"  style="width:1605px;height:500px;"  value=""  emptyText=""></textarea>
+<script type="text/javascript">
+    function onDrawDate(){
+
+    }
+    function onDateChanged(){
+        var date = mini.get("date1").getValue();
+        $.ajax({
+            url : "/prize",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"get",
+                date:date
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("textarea_limit").setValue(result.data1);
+                            mini.get("textarea_list").setValue(result.data2);
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+</script>
+</body>
+
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/util.js" type="text/javascript"></script>
+<script src="/miniui/miniui.js" type="text/javascript"></script>
+</html>

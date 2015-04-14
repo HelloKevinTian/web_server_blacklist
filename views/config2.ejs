@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link href="/miniui/themes/default/miniui.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    </style>
+    <link href="stylesheets/bootstrap-responsive.css" rel="stylesheet">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="/">tools</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li><a href="/">首页</a></li>
+                    <li><a href=<%= link %> ><%= link_show %></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>选择版本</h4>
+<input id="combo1" class="mini-combobox" style="width:150px;" textField="text" valueField="text" emptyText="<%= last_version_record %>"
+       data ="<%= versions %>" value="<%= last_version_record %>" required="true" allowInput="true" showNullItem="true" nullItemText="请选择..."
+       onvaluechanged="onVersionChanged"
+       onvalidation="onComboValidation"/>
+
+<h4>选择渠道</h4>
+<input id="combo2" class="mini-combobox" style="width:150px;" textField="text"
+       data ="<%= channels %>" value="cn" required="true" allowInput="true" showNullItem="true" nullItemText="请选择..."
+       onvaluechanged="onValueChanged"
+       onvalidation="onComboValidation"/>
+
+<a class="mini-button " plain="true" iconCls="icon-add" onclick="onAdd">添加</a>
+<a class="mini-button" plain="true" iconCls="icon-remove" onclick="onDel">删除</a>
+<a class="mini-button" plain="true" iconCls="icon-remove" onclick="onSave">保存</a>
+
+<br /><br />
+<a
+    <textarea id="text_area_config" class="mini-textarea"  style="width:1200px;height:300px;"  value="please choose version and channel"  emptyText="{config}"></textarea>
+    <br /><br />
+</a>
+<a
+    <textarea id="text_area_config_json" class="mini-textarea"  style="width:400px;height:300px;"  value=""  emptyText="{config}"></textarea>
+    <br /><br />
+</a>
+<h4>计划任务</h4>
+<input id="combo3" class="mini-combobox" style="width:150px;" textField="text" emptyText="src template"
+       data ="<%= channels %>" value="cn" required="true" allowInput="true" showNullItem="true" nullItemText="请选择..."
+       onvaluechanged="onValueChanged2" />
+
+<input id="combo4" class="mini-combobox" style="width:150px;" textField="text" emptyText="des template"
+       data ="<%= channels %>" value="cn" required="true" allowInput="true" showNullItem="true" nullItemText="请选择..."
+       onvaluechanged="onValueChanged2" />
+<input id="date1" class="mini-datepicker" value="<%= date %>" ondrawdate="onDrawDate" onvaluechanged="onDateChanged" />
+
+<h4>当前计划任务列表</h4>
+<div id="listbox1" class="mini-listbox" style="width:1605px;height:100px;" data ="<%= schedule_list %>"
+     textField="text" valueField="id" >
+</div>
+<a class="mini-button" plain="true" iconCls="icon-remove" onclick="onCleanAll">清空计划任务</a>
+
+<textarea id="text_area_log" class="mini-textarea" class="auto_textarea"  style="width:1605px;height:50px;"  value="ok"  emptyText="{config}"></textarea>
+
+<h4>计划任务日志</h4>
+<div id="listbox2" class="mini-listbox" style="width:1605px;height:200px;" data ="<%= schedule_log_list %>"
+     textField="text" valueField="id" >
+</div>
+
+<div id="container" class="container">
+    <hr/>
+    <footer>
+        <p><a href="http://blog.chinaunix.net/uid/8625039.html" target="_blank">King Lee</a> 2014</p>
+    </footer>
+</div>
+</body>
+
+<script type="text/javascript">
+    function onVersionClick(e) {
+        $.ajax({
+            url : "/save",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                target:"target"
+            },
+            success : function(json) {
+                if(json){
+                    alert("ok");
+                }else{
+                    alert("error");
+                }
+            }
+        });
+    }
+
+    function onAdd(e) {
+        var new_version = mini.get("combo1").getText();
+        var new_channel = mini.get("combo2").getText();
+        var text_area_config = mini.get("text_area_config");
+        var text_area_config_json = mini.get("text_area_config_json");
+        var log_message = new_version + ":" + new_channel + " ";
+        if("" == new_version || "" == new_channel){
+            log_message = log_message + "param error, please choose version and channel again";
+            mini.get("text_area_log").setValue(log_message);
+            return;
+        }
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"add",
+                version:new_version,
+                channel:new_channel
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            log_message = log_message + "add config ok";
+                            var text_area_config_show_json = jsonToStr(JSON.parse(result.activity), null, '\t');
+                            text_area_config_json.setValue(text_area_config_show_json);
+                            text_area_config.setValue(result.activity);
+                            var data = mini.get("combo2").getData();
+                            data.push({id:data.length,text:new_channel});
+                            mini.get("combo2").setData(data);
+                            mini.get("combo2").select(data.length - 1);
+                            break;
+                        case 202:
+                            log_message = log_message + "add config error,you must make sure the version' default template exits!";
+                            break;
+                    }
+                }else{
+                    log_message = log_message + "add config error"
+                }
+                mini.get("text_area_log").setValue(log_message);
+            }
+        });
+    }
+
+    function onDel(e) {
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var log_message = version + ":" + channel + " ";
+        if(channel == "template"){
+            log_message = log_message + "error,default template cann't be delete";
+            mini.get("text_area_log").setValue(log_message);
+            return;
+        }
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"del",
+                version:version,
+                channel:channel
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            log_message = log_message + "del config ok";
+                            mini.get("text_area_log").setValue(log_message);
+                            mini.get("text_area_config").setValue("");
+                            mini.get("text_area_config_json").setValue("");
+                            break;
+                        case 202:
+                            log_message = log_message + "del config error";
+
+                            break;
+                    }
+                }else{
+                        log_message = log_message + "del config error";
+                }
+                mini.get("text_area_log").setValue(log_message);
+            }
+        });
+    }
+
+    function onVersionChanged(e){
+        var version = mini.get("combo1").getText();
+        var channel = "temp";
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"record",
+                version:version,
+                channel:channel
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            var channels = result.channels;
+                            mini.get("combo2").setData(channels);
+                            mini.get("combo3").setData(channels);
+                            mini.get("combo4").setData(channels);
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    function onValueChanged(e) {
+        onShow();
+    }
+
+    function onValueChanged2(e) {
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var log_message = version + ":" + channel + " ";
+        var text_area_log = mini.get("text_area_log");
+        if("" == version){
+            log_message = log_message + "param error, please choose version first";
+            text_area_log.setValue(log_message);
+        }
+    }
+
+    function onComboValidation(e) {
+        onShow();
+    }
+    function onShow(){
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var log_message = version + ":" + channel + " ";
+        var text_area_log = mini.get("text_area_log");
+        var text_area_config = mini.get("text_area_config");
+        var text_area_config_json = mini.get("text_area_config_json");
+        if("" == version || "" == channel){
+            log_message = log_message + "param error, please choose version and channel again";
+            text_area_log.setValue(log_message);
+            text_area_config.setValue("");
+            text_area_config_json.setValue("");
+            return;
+        }
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"show",
+                version:version,
+                channel:channel
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            if(0){
+                                text_area_config.setValue(result.activity);
+                            }
+                            else{
+                                var text_area_config_show_json = jsonToStr(JSON.parse(result.activity), null, '\t');
+                                text_area_config_json.setValue(text_area_config_show_json);
+                                text_area_config.setValue(result.activity);
+                            }
+                            log_message = log_message + "get config ok";
+                            break;
+                        case 201:
+                            log_message = log_message + "error code:201,param error";
+                            break;
+                        case 202:
+                            log_message = log_message + "error code:202,can not find";
+                            text_area_config_json.setValue("");
+                            text_area_config.setValue("");
+                            break;
+                    }
+                }else{
+                    log_message = log_message + "show error";
+                    text_area_config_json.setValue("");
+                }
+                text_area_log.setValue(log_message);
+            }
+        });
+    }
+
+    function onSave(e) {
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var log_message = version + ":" + channel + " ";
+        var text_area_config = mini.get("text_area_config");
+        var text_area_config_json = mini.get("text_area_config_json");
+        var text_area_log = mini.get("text_area_log");
+        var config = text_area_config.getValue();
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"save",
+                version:version,
+                channel:channel,
+                config:config
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            log_message = log_message + "save ok";
+                            var text_area_config_show_json = jsonToStr(JSON.parse(text_area_config.getValue()), null, '\t');
+                            text_area_config_json.setValue(text_area_config_show_json);
+                            break;
+                        case 201:
+                            log_message = log_message + "save error,please check the config format";
+                            text_area_config_json.setValue("");
+                            break;
+                        case 202:
+                            log_message = log_message + "redis error";
+                            break;
+                    }
+                }else{
+                    log_message = log_message + "save error";
+                }
+                text_area_log.setValue(log_message);
+            }
+        });
+    }
+
+    function onCheck(){
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var log_message = version + ":" + channel + " ";
+        var text_area_config = mini.get("text_area_config");
+        var text_area_config_json = mini.get("text_area_config_json");
+        var text_area_log = mini.get("text_area_log");
+
+        var activity = text_area_config.getValue();
+        try {
+            jsonToStr(JSON.parse(activity), null, '\t');
+        } catch (err) {
+            log_message = log_message + "format error,please check it again!";
+            text_area_log.setValue(log_message);
+            text_area_config_json.setValue("");
+            return;
+        }
+        var text_area_config_show_json = jsonToStr(JSON.parse(activity), null, '\t');
+        text_area_config_json.setValue(text_area_config_show_json);
+        log_message = log_message + "format ok";
+        text_area_log.setValue(log_message);
+    }
+
+    function onDrawDate(){
+
+    }
+
+    function onDateChanged(){
+        var version = mini.get("combo1").getText();
+        var channel = mini.get("combo2").getText();
+        var channel_src = mini.get("combo3").getText();
+        var channel_des = mini.get("combo4").getText();
+        var plan_date = mini.get("date1").getValue();
+        var text_area_log = mini.get("text_area_log");
+        if("" == version || "" == channel_src || "" == channel_des || "" == plan_date){
+            log_message = log_message + "param error, please choose version and channel_src, channel_des again";
+            text_area_log.setValue(log_message);
+            return;
+        }
+        var log_message = version + ":" + channel_src + " " + channel_des + " " + plan_date + " ";
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"plan",
+                version:version,
+                channel:channel,
+                channel_src:channel_src,
+                channel_des:channel_des,
+                plan_date:plan_date
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            log_message = log_message + "---plan execute ok";
+                            text_area_log.setValue(log_message);
+                            break;
+                        case 202:
+                            log_message = log_message + "---plan execute error";
+                            text_area_log.setValue(log_message);
+                            break;
+                        case 205:
+                            log_message = log_message + "---plan set ok";
+                            text_area_log.setValue(log_message);
+                            mini.get("listbox1").removeAll();
+                            mini.get("listbox2").removeAll();
+                            for(var i = 0; i < result.schedule_list.length; ++i){
+                                mini.get("listbox1").addItem({id:result.schedule_list[i].id,text:result.schedule_list[i].text},i);
+                            }
+                            for(var i = 0; i < result.schedule_log_list.length; ++i){
+                                mini.get("listbox2").addItem({id:result.schedule_log_list[i].id,text:result.schedule_log_list[i].text},i);
+                            }
+                            break;
+                    }
+                    return;
+                }else{
+
+                }
+            }
+        });
+    }
+
+    function onCleanAll(){
+        $.ajax({
+            url : "/config2",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"clean",
+                version:"no_version",
+                channel:"no_channel"
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("text_area_log").setValue("clean ok");
+                            mini.get("listbox1").removeAll();
+                            mini.get("listbox2").removeAll();
+                            for(var i = 0; i < result.schedule_log_list.length; ++i){
+                                mini.get("listbox2").addItem({id:result.schedule_log_list[i].id,text:result.schedule_log_list[i].text},i);
+                            }
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+
+</script>
+
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/util.js" type="text/javascript"></script>
+<script src="/miniui/miniui.js" type="text/javascript"></script>
+</html>

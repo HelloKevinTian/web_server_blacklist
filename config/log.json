@@ -1,0 +1,47 @@
+{
+  "appenders": [
+     {
+      "type": "file",
+      "filename": "./logs/http-logger.log",
+      "maxLogSize": 204800,
+      "backups": 3,
+      "category": "http-logger"
+    },
+    {
+          "type": "file",
+          "filename": "./logs/rank-logger.log",
+          "maxLogSize": 204800,
+          "backups": 3,
+          "category": "rank-logger"
+    },
+    {
+      "type": "file",
+      "filename": "./logs/rank-for-pvp-logger.log",
+      "maxLogSize": 204800,
+      "backups": 3,
+      "category": "rank-for-pvp-logger"
+    },
+    {
+      "type": "file",
+      "filename": "./logs/relative-logger.log",
+      "maxLogSize": 204800,
+      "backups": 3,
+      "category": "relative-logger"
+    },
+    {
+      "type": "file",
+      "absolute": true,
+      "filename": "./logs/absolute-logger.log",
+      "maxLogSize": 204800,
+      "backups": 3,
+      "category": "absolute-logger"          
+    }
+  ],
+  "levels": {
+	"http-logger" : "ERROR",
+	"rank-logger" : "DEBUG",
+	"rank-for-pvp-logger" : "DEBUG",
+    "relative-logger" : "DEBUG",
+	"absolute-logger" : "ERROR"
+  }
+}

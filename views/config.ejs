@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.css'/>
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    </style>
+    <link href="stylesheets/bootstrap-responsive.css" rel="stylesheet">
+</head>
+
+<script type="text/javascript">
+    function show_channel() {
+        var array_string = "<%= array %>";
+        var array = array_string.split(',');
+        document.form_channel.select_channel.length = 0;
+        for(var i = 0; i < array.length; ++i){
+            document.form_channel.select_channel.options[i] = new Option(array[i],array[i]);
+        }
+    }
+
+    function change_channel() {
+        //  do something
+    }
+</script>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="/">tools</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li><a href="/">首页</a></li>
+                    <li><a href=<%= link %> ><%= link_show %></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<tr>
+    <td height="34"><span class="style1" style="font-weight:bold ">channel</span></td>
+</tr>
+<form name="form_channel" method="post" action="">
+    <select name="select_channel" id="select_channel" size="1" onFocus="show_channel()" onchange="change_channel()">
+        <option selected><%= channel %></option>
+        <input type="submit" name="choose" value="选择">
+    </select>
+    <label>
+        <textarea name="config_info" cols="200" rows="10"><%= activity %></textarea>
+        <input type="submit" name="save" value="保存">
+    </label>
+</form>
+
+<div id="container" class="container">
+    <hr/>
+    <footer>
+        <p><a href="http://blog.chinaunix.net/uid/8625039.html" target="_blank">King Lee</a> 2014</p>
+    </footer>
+</div>
+
+</body>
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+</html>

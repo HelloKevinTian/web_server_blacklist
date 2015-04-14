@@ -1,0 +1,18 @@
+{
+    "pool_1" : {
+        "hostname" : "10.10.2.183",
+        "port" : 25040,
+        "max" : 10,
+        "idleTimeoutMillis" : 30000,
+        "log" : false,
+        "proxy" : true
+    },
+    "pool_2" : {
+        "hostname" : "127.0.0.1",
+        "port" : 6379,
+        "max" : 10,
+        "idleTimeoutMillis" : 30000,
+        "log" : false,
+        "proxy" : false
+    }
+}

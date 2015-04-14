@@ -1,0 +1,9 @@
+[
+	{"id":1,"type":"REAL","data":"1","limit":10,"name":"赛车模型"},
+	{"id":2,"type":"REAL","data":"2","limit":10,"name":"1000元京东卡"},
+	{"id":3,"type":"REAL","data":"3","limit":10,"name":"50元话费"},
+	{"id":4,"type":"REAL","data":"4","limit":10,"name":"《奔跑吧兄弟》电影票"},
+	{"id":5,"type":"REAL","data":"5","limit":10,"name":"明星同款帽子"},
+	{"id":6,"type":"REAL","data":"6","limit":10,"name":"iphone 6"},
+	{"id":7,"type":"REAL","data":"7","limit":10,"name":"ipad air 2"}
+]

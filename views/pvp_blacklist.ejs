@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link href="/miniui/themes/default/miniui.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    </style>
+    <link href="stylesheets/bootstrap-responsive.css" rel="stylesheet">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="/">tools</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li><a href="/">首页</a></li>
+                    <li><a href=<%= link %> ><%= link_show %></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<h4>黑名单:</h4>
+<input id="date1" class="mini-datepicker" value="<%= date %>"  onvaluechanged="onDateChanged" />
+<div id="ck1" name="product" class="mini-checkbox" checked="false" readOnly="false" text="MM争霸赛" onvaluechanged="onValueChanged"></div>
+<textarea id="textarea_list" class="mini-textarea" class="auto_textarea"  style="width:1605px;height:500px;" wrap="soft" value=<%= black_list %>  emptyText=""></textarea>
+<h4>请输入device guid</h4>
+<input id="tb" class="mini-textbox" emptyText="device guid"/>
+<a class="mini-button " plain="true" iconCls="icon-add" onclick="onAdd">删除</a>
+<a class="mini-button " plain="true" iconCls="icon-add" onclick="onDel">还原</a>
+<textarea id="log" class="mini-textarea" class="auto_textarea"  style="width:1605px;height:50px;"  value=""  emptyText="{config}"></textarea>
+<div id="container" class="container">
+    <hr />
+    <footer>
+        <p><a href="http://blog.chinaunix.net/uid/8625039.html" target="_blank">King Lee</a> 2014</p>
+    </footer>
+</div>
+
+<script type="text/javascript">
+    function onAdd(e) {
+        var device_guid = mini.get("tb").getValue();
+        $.ajax({
+            url : "/pvp_blacklist",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"del",
+                device_guid:device_guid
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("log").setValue("del ok");
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+    function onDel(e) {
+        var device_guid = mini.get("tb").getValue();
+        $.ajax({
+            url : "/pvp_blacklist",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"restore",
+                device_guid:device_guid
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("log").setValue("restore ok");
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+    function onDateChanged(e){
+        var select_date = mini.get("date1").getValue();
+        $.ajax({
+            url : "/pvp_blacklist",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"date",
+                select_date:select_date
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("textarea_list").setValue("");
+                            mini.get("textarea_list").setValue(result.string_black_list_show);
+                            mini.get("log").setValue("get ok");
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+    function onValueChanged(e){
+        var checked = mini.get("ck1").getChecked();
+        $.ajax({
+            url : "/pvp_blacklist",
+            dataType: 'json',
+            cache: false,
+            type : "post",
+            data : {
+                type:"mm",
+                checked:checked
+            },
+            success : function(result) {
+                if(result){
+                    switch (result.code)
+                    {
+                        case 200:
+                            mini.get("textarea_list").setValue("");
+                            mini.get("textarea_list").setValue(result.string_black_list_show);
+                            mini.get("log").setValue("get ok");
+                            break;
+                    }
+                }else{
+
+                }
+            }
+        });
+    }
+</script>
+</body>
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script src="/miniui/miniui.js" type="text/javascript"></script>
+</html>

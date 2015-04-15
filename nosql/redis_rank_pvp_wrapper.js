@@ -455,7 +455,7 @@ redis_rank_pvp_wrapper.record_cheat_info = function(device_guid,rank_info){
         });
     });
 };
-
+///////////////////////////////////////////////
 redis_rank_pvp_wrapper.get_block_list = function(cb){
     redis_pools.execute('pool_1',function(client, release) {
         client.hgetall(h_rank_pvp_cheat,function (err, reply) {
